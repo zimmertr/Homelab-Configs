@@ -157,7 +157,7 @@ services:
         volumes:
             - /SaturnPool/Apps/NextCloud/config/:/config
             - /SaturnPool/Apps/NextCloud/local_data:/data
-			- /SaturnPool/Apps/NextCloud/apps/jsloader/:/config/www/nextcloud/apps/jsloader/
+            - /SaturnPool/Apps/NextCloud/apps/jsloader/:/config/www/nextcloud/apps/jsloader/
             - /SaturnPool:/SaturnPool
         environment:
             - TZ="Pacific"
