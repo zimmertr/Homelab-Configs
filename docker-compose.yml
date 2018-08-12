@@ -1,0 +1,224 @@
+version: '3'
+services:
+    PiHole:
+        image: diginc/pi-hole:latest
+        restart: always
+        hostname: "pihole"
+        ports:
+            - "53:53/tcp"
+            - "53:53/udp"
+            - "67:67/udp"
+            - "80:80/tcp"
+            - "443:443/tcp"
+        volumes:
+            - /SaturnPool/Apps/PiHole/etc/pihole:/etc/pihole/
+            - /SaturnPool/Apps/PiHole/var/log/pihole.log:/var/log/pihole.log
+        environment:
+            - WEBPASSWORD=>PASSWORD<
+            - ServerIP=>INTERNALIPOFHOST<
+            - VIRTUAL_HOST=>DOMAINNAME<
+            - VIRTUAL_PORT=80
+            - TZ="Pacific"
+            - DNS1=>BIND<
+            - DNS2=>BIND<
+            - PUID=1002
+            - PGID=1007
+        extra_hosts:
+            - >hostname<:>ipaddress< 
+
+    Portainer:
+        image: portainer/portainer
+        restart: always
+        ports:
+            - "9000:9000"
+        command: -H unix:///var/run/docker.sock
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /SaturnPool/Apps/Portainer/data:/data
+        environment:
+            - TZ="Pacific"
+            - PUID=1002
+            - PGID=1007
+
+    Statsbot:
+        image: zimmertr/statsbot:latest
+        restart: always
+        hostname: "statsbot"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /SaturnPool/Apps/Statsbot/stats.txt:/stats.txt
+
+    Weatherpy:
+        image: zimmertr/weatherpy:latest
+        restart: always
+        hostname: "weatherpy"
+        volumes:
+            - /SaturnPool/Apps/Weatherpy/weatherrc:/root/.weatherrc
+            - /SaturnPool/Apps/Weatherpy/weather.txt:/root/weather.txt
+        environment:
+            - TZ="Pacific"
+            - PUID=1002
+            - PGID=1007
+    
+    httpd:
+        image: zimmertr/personal-website:latest
+        depends_on: 
+            - Weatherpy
+            - Statsbot
+        restart: always
+        hostname: "personal_website"
+        ports:
+            - "2000:80"
+        volumes:
+            - /SaturnPool/Apps/Statsbot/stats.txt:/var/www/cgi-bin/stats.txt:ro
+            - /SaturnPool/Apps/Weatherpy/weather.txt:/var/www/cgi-bin/weather.txt:ro
+            - /SaturnPool/Apps/Apache/Files:/var/www/html/Files
+            - /SaturnPool/Apps/Shared/analytics.js:/var/www/html/analytics.js
+        environment:
+            - TZ="Pacific"
+            - PUID=1002
+            - PGID=1007
+
+    Deluge:
+        image: linuxserver/deluge
+        restart: always
+        hostname: "deluge"
+        ports: 
+            - "8112:8112"
+            - "58846:58846"
+            - "7850-7860:7850-7860"
+        volumes:
+            - /SaturnPool/Downloads/:/downloads
+            - /SaturnPool/:/SaturnPool/
+            - /SaturnPool/Apps/Deluge/:/config
+        environment:
+            - PUID=1002
+            - PGID=1007
+            - TZ="Pacific"
+
+    Sonarr:
+        image: linuxserver/sonarr
+        restart: always
+        hostname: "sonarr"
+        ports: 
+            - "8989:8989"
+        volumes:
+            - /SaturnPool/Apps/Sonarr/config:/config
+            - /SaturnPool/TV Shows/:/tv
+            - /SaturnPool/Downloads/:/downloads
+        environment:
+            - PUID=1002
+            - PGID=1007
+            - TZ="Pacific"
+
+    Radarr:
+        image: linuxserver/radarr
+        restart: always
+        hostname: "radarr"
+        ports: 
+            - "7878:7878"
+        volumes:
+            - /SaturnPool/Apps/Radarr/config:/config
+            - /SaturnPool/Movies/:/movies
+            - /SaturnPool/Downloads/:/downloads
+        environment:
+            - PUID=1002
+            - PGID=1007
+            - TZ="Pacific"
+
+
+    Mariadb:
+        image: mariadb
+        restart: always
+        hostname: "mariadb"
+        ports:
+            - 3306:3306
+        volumes:
+            - /SaturnPool/Apps/NextCloud/var/lib/mysql:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=>ROOTPASSWORD<
+            - MYSQL_PASSWORD=>PASSWORD<
+            - MYSQL_DATABASE=>DATABASE<
+            - MYSQL_USER=>USERNAME<
+            - TZ="Pacific"
+            - PUID=1002 
+            - PGID=1007
+
+    NextCloud:  
+        image: linuxserver/nextcloud
+        restart: always
+        depends_on:
+            - Mariadb
+        hostname: "nextcloud"
+        links:
+            - Mariadb
+        ports:
+            - 8080:443
+        volumes:
+            - /SaturnPool/Apps/NextCloud/config/:/config
+            - /SaturnPool/Apps/NextCloud/local_data:/data
+			- /SaturnPool/Apps/NextCloud/apps/jsloader/:/config/www/nextcloud/apps/jsloader/
+            - /SaturnPool:/SaturnPool
+        environment:
+            - TZ="Pacific"
+            - PUID=1002
+            - PGID=1007
+
+    Plex:
+        image: plexinc/pms-docker
+        restart: always
+        hostname: "plex"
+        network_mode: "host"
+        ports:
+            - 32400:32400/tcp
+            - 3005:3005/tcp
+            - 8324:8324/tcp
+            - 32469:32469/tcp
+            - 1900:1900/udp
+            - 32410:32410/udp
+            - 32412:32412/udp
+            - 32413:32413/udp
+            - 32414:32414/udp
+        volumes:
+            - /SaturnPool/Apps/Plex/config:/config
+            - /SaturnPool/:/data
+        environment:
+            - TZ="Pacific"
+            - ADVERTISE_IP="https://>IPADDROFHOST<:32400/"
+            - PLEX_UID=1002
+            - PLEX_GID=1007
+
+    Tautulli:
+        image: linuxserver/tautulli
+        depends_on:
+            - Plex
+        restart: always
+        hostname: "tautulli"
+        ports: 
+            - "8181:8181"
+        volumes:
+            - /SaturnPool/Apps/Tautulli/config:/config
+            - /SaturnPool/Apps/Plex/config/Library/Application\ Support/Plex\ Media\ Server/Logs:/logs:ro
+        environment:
+            - PUID=1002
+            - PGID=1007
+            - TZ="Pacific"
+
+    OpenVPN:
+        image: linuxserver/openvpn-as
+        depends_on:
+            - PiHole
+        restart: always
+        hostname: "openvpn"
+        privileged: "true"
+        ports:
+            - 943:943/tcp
+            - 8050:8050/tcp
+            - 8051:8051/udp
+        volumes:
+            - /SaturnPool/Apps/OpenVPN/config:/config
+        environment:
+            - TZ="Pacific"
+            - PUID=1002
+            - GUID=1007
+

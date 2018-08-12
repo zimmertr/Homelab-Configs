@@ -1,0 +1,4 @@
+19 14 * * * cd /SaturnPool/Apps;date1=$(date +\%F);date2=Backup_$(date +\%F-\%H:\%I:\%S); mkdir -p /SaturnPool/Backups/Apps_Folder/$date1/$date2; for i in *; do tar -czvf "/SaturnPool/Backups/Apps_Folder/$date1/$date2/${i\%/}.tar" "$i"; done; echo | mail -s "Apps Backed Up - $(date)" >EMAILADDRESS< 
+0 0 1 * * /sbin/zpool scrub SaturnPool; echo | mail -s "Zpool Scrub Initiated - $(date)" >EMAILADDRESS<
+0 3 * * 0 find /SaturnPool/Backups/Apps_Folder/* -mtime +15 -exec rm {} \;
+0 2 * * 0 for id in sda sdb sdc sdd sde sdf sdg; do echo \*\*\*\*\*$id\*\*\*\*\*; /usr/sbin/smartctl -H -l error /dev/$id | grep -E 'result|Logged'; echo; done | mail -s "S.M.A.R.T Results - $(date)" >EMAILADDRESS<

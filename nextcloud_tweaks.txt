@@ -1,0 +1,15 @@
+Edit /SaturnPool/Apps/NextCloud/config/www/nextcloud/config/config.php and add your trusted domains and overwrite information. For example:
+
+```
+'trusted_domains' => 
+  array (
+    0 => '>EXTERNALIP<:>EXTERNALPORT<',
+    1 => '>EXTERNALFQDN<:>EXTERNALPORT<',
+  ),
+  'overwrite.cli.url' => '>EXTERNALFQDN<',
+  'overwritehost' => '>EXTERNALFQDN<',
+```
+
+Configure Nextcloud volume mount for `jsloader` plugin for Google Analytics tracking. Enable plugin and configure in UI.
+
+`/Apps/NextCloud/apps/jsloader/:/config/www/nextcloud/apps/jsloader/`

@@ -1,0 +1,5 @@
+Docker uses iptables on the host to configure firewalls for host port mapping. With KVM/Proxmox, this can be troublesome when Docker suddenly starts putting firewall rules on your hypervisor. 
+
+Add this forward rule for your proxmox bridge to allow it to get back into the network and not be dropped: `iptables -A FORWARD -i br0 -o br0 -j ACCEPT`
+
+Also install this package: `iptables-persistent`.
