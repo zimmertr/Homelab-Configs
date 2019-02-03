@@ -13,7 +13,7 @@ touch /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps
 
 for i in *;
     do tar -czvf "/SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/${i%/}.tar" "$i" >> /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps_backup.log;
-done || exit 1;
+done;
 
 
 # Create directory structsure for date/time and backup the K8s apps directory.
@@ -25,7 +25,7 @@ touch /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory
 
 for i in *;
     do tar -czvf "/SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/${i%/}.tar" "$i" >> /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/K8s_backup.log;
-done ||  exit 1;
+done;
 
 
 # Collect backup metrics for the verification email.
@@ -41,13 +41,12 @@ echo -e "\
 ----------------------------------------------------------------\n \
 Apps Backup Duration:\t    $(expr $(date +%s) - $Apps_Backup_Initiated) Seconds\n \
 K8s Backup Duration:\t     $(expr $(date +%s) - $K8s_Backup_Initiated) Seconds\n \
-New Backup Size:\t\t$New_Backup_Size\n \
-Complete Backup Size:\t     $Total_Backup_Size\n \
-Remaining Disk Space:\t     $Remaining_Disk_Space\n \
+New Backup Size:\t         $New_Backup_Size\n \
+Complete Backup Size:\t    $Total_Backup_Size\n \
+Remaining Disk Space:\t    $Remaining_Disk_Space\n \
 ----------------------------------------------------------------\n\n \
 \t\tNew Backup Structure:
 ----------------------------------------------------------------\n \
 $Created_Dirs\n \
 ----------------------------------------------------------------" \
-| mail -s "Apps Backed Up - $(date +"%m-%d-%y") ($Remaining_Disk_Space free)" thomaszimmerman93@gmail.com -a /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps_backup.log -a /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/K8s_backup.log
-
+| mail -s "Apps Backed Up - $(date +"%m-%d-%y") ($Remaining_Disk_Space free)" -a /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps_backup.log -a /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/K8s_backup.log thomaszimmerman93@gmail.com
