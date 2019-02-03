@@ -40,10 +40,10 @@ echo -e "\
      A new backup has been performed.\n \
 ----------------------------------------------------------------\n \
 Apps Backup Duration:\t    $(expr $(date +%s) - $Apps_Backup_Initiated) Seconds\n \
-K8s Backup Duration:\t    $(expr $(date +%s) - $K8s_Backup_Initiated) Seconds\n \
+K8s Backup Duration:\t     $(expr $(date +%s) - $K8s_Backup_Initiated) Seconds\n \
 New Backup Size:\t\t$New_Backup_Size\n \
-Complete Backup Size:\t   $Total_Backup_Size\n \
-Remaining Disk Space:\t    $Remaining_Disk_Space\n \
+Complete Backup Size:\t     $Total_Backup_Size\n \
+Remaining Disk Space:\t     $Remaining_Disk_Space\n \
 ----------------------------------------------------------------\n\n \
 \t\tNew Backup Structure:
 ----------------------------------------------------------------\n \
