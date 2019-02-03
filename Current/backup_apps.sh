@@ -29,7 +29,7 @@ done ||  exit 1;
 
 
 # Collect backup metrics for the verification email.
-New_Backup_Size="$(du -ch /SaturnPool/Backups/{Apps,Kubernetes}/$Date_Main_Directory/{$Date_Apps_Subdirectory,$Date_K8s_Subdirectory} | grep total | awk '{print $1}')"
+New_Backup_Size="$(du -ch /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory  | grep total | awk '{print $1}')"
 Total_Backup_Size="$(du -ch /SaturnPool/Backups/{Apps,Kubernetes} | grep total | awk '{print $1}')"
 Remaining_Disk_Space="$(df -h | grep '/SaturnPool' | awk '{print $4}')"
 Created_Dirs="$(cd /SaturnPool/Backups && tree -h {Apps,Kubernetes}/$Date_Main_Directory/)"
