@@ -9,9 +9,10 @@ cd /SaturnPool/Apps/
 Date_Apps_Subdirectory=Backup_$(date +\%F-\%H:\%I:\%S)
 Apps_Backup_Initiated=$(date +%s)
 mkdir -p /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory
+touch /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps_backup.log
 
 for i in *;
-    do tar -czvf "/SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/${i%/}.tar" "$i";
+    do tar -czvf "/SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/${i%/}.tar" "$i" >> /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps_backup.log;
 done || exit 1;
 
 
@@ -20,9 +21,10 @@ cd /SaturnPool/Kubernetes/
 Date_K8s_Subdirectory=Backup_$(date +\%F-\%H:\%I:\%S)
 K8s_Backup_Initiated=$(date +%s)
 mkdir -p /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory
+touch /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/K8s_backup.log
 
 for i in *;
-    do tar -czvf "/SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/${i%/}.tar" "$i";
+    do tar -czvf "/SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/${i%/}.tar" "$i" >> /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/K8s_backup.log;
 done ||  exit 1;
 
 
@@ -47,5 +49,5 @@ Remaining Disk Space:\t    $Remaining_Disk_Space\n \
 ----------------------------------------------------------------\n \
 $Created_Dirs\n \
 ----------------------------------------------------------------" \
-| mail -s "Apps Backed Up - $(date +"%m-%d-%y") ($Remaining_Disk_Space free)" thomaszimmerman93@gmail.com
+| mail -s "Apps Backed Up - $(date +"%m-%d-%y") ($Remaining_Disk_Space free)" thomaszimmerman93@gmail.com -a /SaturnPool/Backups/Apps/$Date_Main_Directory/$Date_Apps_Subdirectory/apps_backup.log -a /SaturnPool/Backups/Kubernetes/$Date_Main_Directory/$Date_K8s_Subdirectory/K8s_backup.log
 
